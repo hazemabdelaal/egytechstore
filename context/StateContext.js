@@ -10,24 +10,46 @@ export const StateContext = ({ children }) => {
   const [totalQuantities, setTotalQuantities] = useState(0);
   const [qty, setQty] = useState(1);
 
+  useEffect(() => {
+    const cartData = JSON.parse(localStorage.getItem('cartItems'));
+    const totalPriceData = JSON.parse(localStorage.getItem('totalPrice'));
+    const totalQuantitiesData = JSON.parse(
+      localStorage.getItem('totalQuantities')
+    );
+
+    if (cartData) setCartItems(cartData);
+    if (totalPriceData) setTotalPrice(totalPriceData);
+    if (totalQuantitiesData) setTotalQuantities(totalQuantitiesData);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem('totalPrice', JSON.stringify(totalPrice));
+    localStorage.setItem('totalQuantities', JSON.stringify(totalQuantities));
+  }, [cartItems, totalPrice, totalQuantities]);
+
   let foundProduct;
   let index;
 
   const onAdd = (product, quantity) => {
-    const checkProductInCart = cartItems.find(item => item._id === product.id);
+    const checkProductInCart = cartItems.find(item => item._id === product._id);
 
     setTotalPrice(prevTotalPrice => prevTotalPrice + product.price * quantity);
     setTotalQuantities(prevTotalQuantities => prevTotalQuantities + quantity);
 
     if (checkProductInCart) {
       const updatedCartItems = cartItems.map(cartProduct => {
-        if (cartProduct._id === product.id)
+        if (cartProduct._id === product._id) {
           return {
             ...cartProduct,
             quantity: cartProduct.quantity + quantity,
           };
+        } else {
+          return {
+            ...cartProduct,
+          };
+        }
       });
-
       setCartItems(updatedCartItems);
     } else {
       product.quantity = quantity;
@@ -102,6 +124,7 @@ export const StateContext = ({ children }) => {
         totalPrice,
         totalQuantities,
         qty,
+        setQty,
         incQty,
         decQty,
         onAdd,

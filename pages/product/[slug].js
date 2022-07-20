@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import {
   AiOutlineMinus,
   AiOutlinePlus,
@@ -13,7 +14,13 @@ import { useStateContext } from '../../context/StateContext';
 const ProductDetails = ({ product, products }) => {
   const { image, name, details, price } = product;
   const [index, setIndex] = useState(0);
-  const { decQty, incQty, qty, onAdd, setShowCart } = useStateContext();
+  const { decQty, incQty, qty, setQty, onAdd, setShowCart } = useStateContext();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    setQty(1);
+  }, [router.query.slug]);
 
   const handleBuyNow = () => {
     onAdd(product, qty);
